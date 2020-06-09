@@ -51,7 +51,8 @@ describe('organization routes', () => {
       .then(res => {
         expect(res.body).toEqual([{
           _id: expect.anything(),
-          title: 'tester title'
+          title: 'tester title',
+          imageURL: 'tester URL'
         }]);
       });
 
