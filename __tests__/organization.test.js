@@ -57,7 +57,7 @@ describe('organization routes', () => {
 
   });
 
-  it('can find a specific organization', async() => {
+  it('can find a specific organization', () => {
     return Organization.create({
       title: 'tester title',
       description: 'tester description',
