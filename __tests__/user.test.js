@@ -71,7 +71,7 @@ describe('organization routes', () => {
   });
 
   it(`deletes user by id`, () => {
-    User.create({
+    return User.create({
       name: 'tester username',
       phone: '123-456-7890',
       email: 'tester@tester.com',
@@ -79,7 +79,7 @@ describe('organization routes', () => {
       imageUrl: 'tester URL'
     })
       .then(user => request(app)
-        .delete(`api/v1/users/${user._id}`))
+        .delete(`/api/v1/users/${user._id}`))
       .then(res => {
         expect(res.body).toEqual({
           

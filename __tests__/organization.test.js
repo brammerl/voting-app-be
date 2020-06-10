@@ -98,7 +98,7 @@ describe('organization routes', () => {
       });
   });
 
-  it(`delets organization by id via DELETE`, () => {
+  it(`deletes organization by id via DELETE`, () => {
     return Organization.create(
       {
         title: 'tester title',
