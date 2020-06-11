@@ -7,6 +7,7 @@ const request = require('supertest');
 const app = require('../lib/app');
 const Organization = require('../lib/models/Organization');
 const User = require('../lib/models/User');
+const Membership = require('../lib/models/Membership');
 
 describe('poll routes', () => {
   beforeAll(async() => {
@@ -41,4 +42,45 @@ describe('poll routes', () => {
     await mongoose.connection.close();
     return mongodb.stop();
   }); 
+
+  it(`creates the membership via POST`, () => {
+    return request(app)
+      .post('/api/v1/memberships/')
+      .send({
+        organization: organization._id,
+        user: user._id
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          organization: organization.id,
+          user: user.id,
+          __v: 0
+        });
+      });
+  });
+
+  it(`gets all memberships with organization id via GET`, () => {
+    return Membership.create({
+      organization: organization._id,
+      user: user._id
+    })
+      .then((organization) => request(app).get(`/api/v1/memberships?org=${organization._id}`))
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          organization: {
+            _id: organization.id,
+            title: organization.title,
+            imageURL: organization.imageURL
+          },
+          user: {
+            _id: user.id,
+            name: user.name,
+            imageUrl: user.imageUrl
+          },
+          __v: 0 
+        });
+      });
+  });
 });
