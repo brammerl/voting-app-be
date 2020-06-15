@@ -77,7 +77,7 @@ describe('voter routes', () => {
     });
 
     return request(app)
-      .get(`/api/v1/votes?poll=${poll._id}`)
+      .get(`/api/v1/votes/?poll=${poll._id}`)
       .then(res => {
         expect(res.body).toEqual(expect.arrayContaining([{
           _id: expect.anything(),
@@ -86,6 +86,51 @@ describe('voter routes', () => {
           user: user.id,
           __v: 0
         }]));
+      });
+  });
+
+  it('gets all votes on an user', async() => {
+    await Vote.create({
+      user: user._id,
+      poll: poll._id,
+      option: 'option1'
+    });
+
+    return request(app)
+      .get(`/api/v1/votes/?user=${user._id}`)
+      .then(res => {
+        expect(res.body).toEqual([{
+          _id: expect.anything(),
+          poll: poll.id,
+          option: 'option1',
+          user: user.id,
+          __v: 0
+        }]);
+      });
+  });
+
+  it(`updates a voted option`, () => {
+    return Vote.create({
+      user:user._id,
+      poll: poll._id,
+      option: 'option1'
+    })
+
+      .then(vote => {
+        request(app)
+          .patch(`/api/v1/votes/${vote._id}`)
+          .send({
+            option: 'option2'
+          })
+          .then(res => {
+            expect(res.body).toEqual({
+              _id: expect.anything(),
+              user: user.id,
+              poll: poll.id,
+              option: 'option2',
+              __v: 0
+            });
+          });
       });
   });
 }); 
