@@ -23,7 +23,7 @@ describe('poll routes', () => {
     organization = await Organization.create({
       title: 'tester title',
       description: 'tester description',
-      imageURL: 'tester url'
+      imageUrl: 'tester url'
     });
   });
 
@@ -103,7 +103,7 @@ describe('poll routes', () => {
     })
       .then((poll) => {return request(app)
         .patch(`/api/v1/polls/${poll._id}`)
-        .send({ description: 'updated polldescription', title: 'updated poll title'})
+        .send({ description: 'updated polldescription', title: 'updated poll title' })
         .then(res => {
           expect(res.body).toEqual({
             _id: expect.anything(),
@@ -126,7 +126,7 @@ describe('poll routes', () => {
     })
       .then((poll) => {
         return request(app)
-          .delete(`/api/v1/polls/${poll._id}`)
+          .delete(`/api/v1/polls/${poll._id}`);
       })
       .then(res => {
         expect(res.body).toEqual({

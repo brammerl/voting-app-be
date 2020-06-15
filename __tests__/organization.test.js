@@ -28,41 +28,41 @@ describe('organization routes', () => {
       .send({
         title: 'tester title',
         description: 'tester description',
-        imageURL: 'tester url'
+        imageUrl: 'tester url'
       })
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.anything(),
           title: 'tester title',
           description: 'tester description',
-          imageURL: 'tester url',
+          imageUrl: 'tester url',
           __v: 0
         });
       });
   });
 
-  it('gets all organizations via GET', () => {
-    return Organization.create({
+  it('gets all organizations via GET', async() => {
+    await Organization.create({
       title: 'tester title',
       description: 'tester description',
-      imageURL: 'tester URL'
-    })
-      .then(() => request(app).get('/api/v1/organizations/'))
+      imageUrl: 'tester URL'
+    });
+    return request(app)
+      .get('/api/v1/organizations/')
       .then(res => {
         expect(res.body).toEqual([{
           _id: expect.anything(),
           title: 'tester title',
-          imageURL: 'tester URL'
+          imageUrl: 'tester URL'
         }]);
       });
-
   });
 
   it('can find a specific organization', () => {
     return Organization.create({
       title: 'tester title',
       description: 'tester description',
-      imageURL: 'tester URL'
+      imageUrl: 'tester URL'
     })
       .then(organization => request(app).get(`/api/v1/organizations/${organization._id}`))
       .then(res => {
@@ -70,7 +70,7 @@ describe('organization routes', () => {
           _id: expect.anything(),
           title: 'tester title',
           description: 'tester description',
-          imageURL: 'tester URL',
+          imageUrl: 'tester URL',
           __v: 0
         });
       });
@@ -80,7 +80,7 @@ describe('organization routes', () => {
     return Organization.create({
       title: 'tester title',
       description: 'tester description',
-      imageURL: 'tester URL'
+      imageUrl: 'tester URL'
     })
       .then(organization => {
         return request(app)
@@ -92,7 +92,7 @@ describe('organization routes', () => {
           _id: expect.anything(),
           title: 'tester title',
           description: 'new description',
-          imageURL: 'tester URL',
+          imageUrl: 'tester URL',
           __v: 0
         });
       });
@@ -103,16 +103,16 @@ describe('organization routes', () => {
       {
         title: 'tester title',
         description: 'tester description',
-        imageURL: 'tester URL'
+        imageUrl: 'tester URL'
       })
       .then(pizza => {
-        request(app).delete(`/api/v1/organizations/${pizza._id}`)
+        return request(app).delete(`/api/v1/organizations/${pizza._id}`)
           .then(res => {
             expect(res.body).toEqual({
               _id: expect.anything(),
               title: 'tester title',
               description: 'tester description',
-              imageURL: 'tester URL',
+              imageUrl: 'tester URL',
               __v: 0
             });
           });

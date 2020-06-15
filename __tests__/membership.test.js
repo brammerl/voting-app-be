@@ -25,7 +25,7 @@ describe('poll routes', () => {
     organization = await Organization.create({
       title: 'tester title',
       description: 'tester description',
-      imageURL: 'tester url'
+      imageUrl: 'tester url'
     });
 
     user = await User.create(
@@ -60,27 +60,84 @@ describe('poll routes', () => {
       });
   });
 
-  it(`gets all memberships with organization id via GET`, () => {
-    return Membership.create({
+  it(`gets all memberships with organization id via GET`, async() => {
+    await Membership.create({
       organization: organization._id,
       user: user._id
-    })
-      .then((organization) => request(app).get(`/api/v1/memberships?org=${organization._id}`))
+    });
+    return request(app)
+      .get(`/api/v1/memberships?organization=${organization._id}`)
       .then(res => {
-        expect(res.body).toEqual({
+        expect(res.body).toEqual([{
           _id: expect.anything(),
           organization: {
             _id: organization.id,
             title: organization.title,
-            imageURL: organization.imageURL
+            imageUrl: organization.imageUrl
           },
           user: {
             _id: user.id,
             name: user.name,
-            imageUrl: user.imageUrl
+            email: user.email
           },
           __v: 0 
-        });
+        }]);
+      });
+  });
+
+  it(`lists organizations an user is a part of via GET`, async() => {
+    const org1 = await Organization.create({
+      title: 'org1',
+      description: 'org1 description',
+      imageUrl: 'org1 url'
+    });
+    const org2 = await Organization.create({
+      title: 'org2',
+      description: 'org2 description',
+      imageUrl: 'org2 url'
+    });
+
+    await Membership.create({
+      organization: org1._id,
+      user: user._id
+    });
+
+    await Membership.create({
+      organization: org2._id,
+      user: user._id
+    });
+
+    return request(app)
+      .get(`/api/v1/memberships?user=${user._id}`)
+      .then(res => {
+        expect(res.body).toEqual([{
+          _id: expect.anything(),
+          organization: {
+            _id: org1.id,
+            title: 'org1',
+            imageUrl: 'org1 url'
+          },
+          user: {
+            _id: user.id,
+            email: user.email,
+            name: user.name
+          },
+          __v: 0
+        }, 
+        {
+          _id: expect.anything(),
+          organization: {
+            _id: org2.id,
+            title: 'org2',
+            imageUrl: 'org2 url'
+          },
+          user: {
+            _id: user.id,
+            email: user.email,
+            name: user.name
+          },
+          __v: 0
+        }]);
       });
   });
 });
