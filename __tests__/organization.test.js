@@ -6,6 +6,9 @@ const connect = require('../lib/utils/connect');
 const request = require('supertest');
 const app = require('../lib/app');
 const Organization = require('../lib/models/Organization');
+const Vote = require('../lib/models/Vote');
+const User = require('../lib/models/User');
+const Poll = require('../lib/models/Poll');
 
 describe('organization routes', () => {
   beforeAll(async() => {
@@ -98,24 +101,60 @@ describe('organization routes', () => {
       });
   });
 
-  it(`deletes organization by id via DELETE`, () => {
-    return Organization.create(
-      {
-        title: 'tester title',
-        description: 'tester description',
-        imageUrl: 'tester URL'
-      })
-      .then(pizza => {
-        return request(app).delete(`/api/v1/organizations/${pizza._id}`)
-          .then(res => {
-            expect(res.body).toEqual({
-              _id: expect.anything(),
-              title: 'tester title',
-              description: 'tester description',
-              imageUrl: 'tester URL',
-              __v: 0
-            });
-          });
+  it(`deletes org and all polls/votes associated via DELETE`, async() => {
+    const org = await Organization.create({
+      title: 'org title',
+      description: 'org description',
+      imageUrl: 'org url'
+    });
+
+    const poll1 = await Poll.create({
+      organization: org._id,
+      title: 'poll1 title',
+      description: 'poll1 description',
+      option: ['opt1', 'opt2'],
+      imageurl: 'poll1 url'
+    });
+
+    const poll2 = await Poll.create({
+      organization: org._id,
+      title: 'poll2 title',
+      description: 'poll2 description',
+      option: ['opt1', 'opt2'],
+      imageurl: 'poll2 url'
+    });
+
+    const user = await User.create({
+      name: 'user1',
+      phone: '123-456-7890',
+      email: 'tester@test.com',
+      communicationMedium: 'email',
+      imageUrl: 'user url'
+    });
+
+    await Vote.create([{
+      poll: poll1._id,
+      user: user._id,
+      option: 'option1'
+    }, {
+      poll: poll2._id,
+      user: user._id,
+      option: 'option2'
+    }]);
+
+    return request(app)
+      .delete(`/api/v1/organizations/${org._id}`)
+  
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          title: org.title,
+          description: org.description,
+          imageUrl: org.imageUrl,
+          __v: 0
+        });
+
+        return Poll.find({ organization: org._id });
       });
   });
 });
